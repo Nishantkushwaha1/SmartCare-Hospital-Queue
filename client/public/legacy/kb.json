@@ -1,0 +1,850 @@
+[
+ {
+  "id": "how_book",
+  "kw": [
+   "how to book",
+   "how do i book",
+   "how to register",
+   "how to get token",
+   "how to get a token",
+   "steps to book",
+   "booking process",
+   "registration process",
+   "kaise book",
+   "token kaise",
+   "token kaise milega",
+   "registration kaise",
+   "appointment kaise",
+   "how does booking work"
+  ],
+  "ex": [
+   "how do i book an online token",
+   "what is the process to register for a token",
+   "token kaise milega",
+   "how to take appointment"
+  ],
+  "a": "Booking an online token takes about a minute:\n1. Open [[#/register|Get Token]].\n2. Enter patient name, age, mobile number and address, and choose the department.\n3. Verify your mobile number with the 6-digit OTP (in this demo the OTP is shown on screen).\n4. Tap Get Online Token. If the department has a fee you pay by UPI, card or net banking; free departments get the token straight away.\n5. You land on your Token / Parcha page with token number, room and QR.\nTip: you can also just tell me \"book appointment for fever\" and I will do it with you.",
+  "chips": [
+   "Book appointment",
+   "After registration",
+   "Payment methods"
+  ],
+  "next": "after_register"
+ },
+ {
+  "id": "after_register",
+  "kw": [
+   "after registration",
+   "after registering",
+   "after booking",
+   "after i book",
+   "after getting token",
+   "after completing registration",
+   "next step after registration",
+   "what next after",
+   "what to do next",
+   "what happens after",
+   "registration ke baad",
+   "booking ke baad",
+   "token milne ke baad",
+   "uske baad kya",
+   "phir kya karna",
+   "ab kya karna",
+   "what do i do after booking",
+   "next step",
+   "whats next",
+   "what is next"
+  ],
+  "ex": [
+   "what is the next step after completing registration",
+   "what should i do after booking my token",
+   "registration ke baad kya karna hai",
+   "what happens after i get my token"
+  ],
+  "a": "After registration (and payment, if any) you land on your Token / Parcha page. Here is what to do next:\n1. Note your token number (like GM-048), department and room number.\n2. Open [[#/queue|My Queue]] to see patients ahead and your estimated time. It refreshes every few seconds.\n3. Open [[#/genqr|My QR Code]] (or print the parcha from [[#/parcha|Token / Parcha]]) so you can show it at the room.\n4. Reach the hospital before your turn and go to your department's room.\n5. When your turn comes, staff scan your QR or enter your token and your status changes to Consultation. You will also get a notification.\n6. After the doctor sees you, the token shows Completed.",
+  "chips": [
+   "My token status",
+   "Generate QR",
+   "What is a parcha?"
+  ],
+  "next": "go_hospital",
+  "me": "You already have token {t} for {d}. Room {room}, {ahead} patient(s) ahead, estimated time {est}. Open My Queue to follow it live."
+ },
+ {
+  "id": "go_hospital",
+  "kw": [
+   "when should i reach",
+   "when to reach hospital",
+   "what time should i go",
+   "reach hospital",
+   "arrive at hospital",
+   "what to bring",
+   "what to carry",
+   "documents needed",
+   "kab pahunchna",
+   "hospital kab jana",
+   "kya leke jana"
+  ],
+  "ex": [
+   "when should i reach the hospital after booking",
+   "what should i carry to the hospital",
+   "kab pahunchna hai"
+  ],
+  "a": "Check [[#/queue|My Queue]] for patients ahead and your estimated time, and plan to be at your department's room a little before that. Keep your token number or QR handy (phone screenshot or printed parcha), and a photo ID if the hospital asks for one. The estimate can change as the queue moves, so keep an eye on notifications.",
+  "chips": [
+   "Estimated time",
+   "Notifications"
+  ]
+ },
+ {
+  "id": "parcha",
+  "kw": [
+   "what is parcha",
+   "what is a parcha",
+   "parcha",
+   "print parcha",
+   "download parcha",
+   "print token",
+   "token slip",
+   "receipt",
+   "parcha kya hai",
+   "parcha print",
+   "slip"
+  ],
+  "ex": [
+   "what is a parcha",
+   "how to print my token slip",
+   "where is my receipt"
+  ],
+  "a": "The parcha is your printed token slip: token number, department, room, doctor, date, fee receipt and a QR code. Open [[#/parcha|Token / Parcha]] and tap View Parcha / Download to print or save it. Counter (offline) tokens are printed by the admin at the counter.",
+  "chips": [
+   "Generate QR",
+   "After registration"
+  ]
+ },
+ {
+  "id": "qr_generate",
+  "kw": [
+   "generate qr",
+   "my qr",
+   "qr code",
+   "show qr",
+   "where is my qr",
+   "how to get qr",
+   "qr kaha",
+   "qr kaise",
+   "barcode"
+  ],
+  "ex": [
+   "how do i generate my qr code",
+   "where can i find my qr"
+  ],
+  "a": "Open [[#/genqr|My QR Code]] to show the QR for your token. It is also printed on your parcha. Show it at the room so staff can check you in.",
+  "chips": [
+   "Scan QR / check-in",
+   "What is a parcha?"
+  ]
+ },
+ {
+  "id": "qr_scan",
+  "kw": [
+   "scan qr",
+   "scan",
+   "check in",
+   "checkin",
+   "check-in",
+   "patient verification",
+   "verify patient",
+   "qr scan kaise",
+   "qr scan karna"
+  ],
+  "ex": [
+   "how does check in work",
+   "who scans the qr",
+   "how to scan qr at room"
+  ],
+  "a": "Check-in happens at the room: hospital staff open Scan QR (Patient Verification), scan your QR or type your token number, and the token moves to Consultation so the doctor can see you. Patients just need to show the QR or token number.",
+  "chips": [
+   "Generate QR",
+   "After registration"
+  ]
+ },
+ {
+  "id": "queue_position",
+  "kw": [
+   "my position",
+   "position in queue",
+   "how many ahead",
+   "patients ahead",
+   "kitne log",
+   "my turn",
+   "when is my turn",
+   "kab number aayega",
+   "queue position",
+   "how long wait",
+   "waiting time",
+   "wait time",
+   "estimated time",
+   "eta",
+   "how long will it take"
+  ],
+  "ex": [
+   "how long will i have to wait",
+   "how many patients are ahead of me",
+   "mera number kab aayega"
+  ],
+  "a": "Your position and estimated time are on [[#/queue|My Queue]] (or type your token number on the home page). The estimate is patients ahead multiplied by the average consultation time (about 6 minutes by default), and it updates with the live queue, so it can move up or down. Emergency tokens are placed first, which can push others back a little.",
+  "chips": [
+   "My token status",
+   "Why did my time change?"
+  ]
+ },
+ {
+  "id": "estimate_changed",
+  "kw": [
+   "why estimate changed",
+   "estimate changed",
+   "time changed",
+   "wait time increased",
+   "why more wait",
+   "why is my time increasing",
+   "eta changed",
+   "time badh gaya",
+   "estimate kyun badla"
+  ],
+  "ex": [
+   "why did my estimated time change",
+   "why is my waiting time increasing"
+  ],
+  "a": "The estimate is recalculated from the live queue. It can grow if an emergency patient is moved to the front, a consultation takes longer than average, or the doctor's OPD status turns Busy. It can shrink when patients ahead are completed or cancelled.",
+  "chips": [
+   "Emergency priority",
+   "OPD status"
+  ]
+ },
+ {
+  "id": "token_format",
+  "kw": [
+   "what is token number",
+   "token number meaning",
+   "token format",
+   "gm-048 meaning",
+   "what does gm mean",
+   "token code",
+   "token reset",
+   "token valid",
+   "token expire",
+   "token kitne din",
+   "token ka matlab"
+  ],
+  "ex": [
+   "what does my token number mean",
+   "how long is my token valid"
+  ],
+  "a": "A token looks like GM-048: the letters are the department code and the number is your serial in that department today. Numbers restart every day at midnight (IST), and a token is valid only for the day it was issued.",
+  "chips": [
+   "How do I book?",
+   "Queue position"
+  ]
+ },
+ {
+  "id": "quota",
+  "kw": [
+   "70 30",
+   "online quota",
+   "counter quota",
+   "offline tokens",
+   "how many tokens",
+   "tokens left",
+   "tokens available",
+   "daily limit",
+   "token limit",
+   "online full",
+   "tokens full",
+   "no tokens",
+   "online tokens finished",
+   "token khatam"
+  ],
+  "ex": [
+   "why are online tokens full",
+   "how are tokens divided between online and counter"
+  ],
+  "a": "Each department has a daily token limit. 70% can be booked online and 30% are kept for the hospital counter. If online tokens for your department are full, walk in to the counter, tell the admin your department and pay the fee there (cash, UPI or card). Check what is left on [[#/register|Get Token]] or ask me, for example \"Cardiology tokens left\".",
+  "chips": [
+   "Counter booking",
+   "Departments"
+  ]
+ },
+ {
+  "id": "counter",
+  "kw": [
+   "counter booking",
+   "offline booking",
+   "book at counter",
+   "walk in",
+   "walk-in",
+   "offline parcha",
+   "counter token",
+   "counter pe",
+   "counter se token"
+  ],
+  "ex": [
+   "can i book at the hospital counter",
+   "how does offline token work"
+  ],
+  "a": "Counter (offline) tokens are issued by the hospital admin: walk in, tell the admin your department, pay the fee (cash, UPI or card) and collect the printed parcha with QR and room number. Patients cannot book counter tokens from the website.",
+  "chips": [
+   "Online quota",
+   "What is a parcha?"
+  ]
+ },
+ {
+  "id": "payment_methods",
+  "kw": [
+   "payment methods",
+   "how to pay",
+   "pay online",
+   "upi",
+   "card payment",
+   "net banking",
+   "payment options",
+   "fee kaise",
+   "payment kaise",
+   "paise kaise"
+  ],
+  "ex": [
+   "how can i pay the fee",
+   "which payment methods are accepted"
+  ],
+  "a": "Online fees are paid by UPI, card or net banking in a secure Razorpay window (in this demo there may be a practice payment window instead). Card and bank details are entered only in that secure window and never reach SmartCare. Counter tokens can be paid in cash, UPI or card.",
+  "chips": [
+   "Payment failed",
+   "Refund"
+  ]
+ },
+ {
+  "id": "payment_failed",
+  "kw": [
+   "payment failed",
+   "payment fail",
+   "money deducted",
+   "amount deducted",
+   "paid but no token",
+   "paid but token not received",
+   "token not received",
+   "no token after payment",
+   "payment stuck",
+   "payment pending",
+   "payment nahi hua",
+   "paise kat gaye",
+   "paise kat gye",
+   "token nahi mila",
+   "payment issue"
+  ],
+  "ex": [
+   "my payment failed what should i do",
+   "money deducted but no token generated"
+  ],
+  "a": "Don't pay again straight away. Your token is held for about 10 minutes while you pay, and you can retry in the same window.\nIf money was deducted but you saw no token: the payment confirmation normally issues the token automatically even if the browser closed. Check [[#/parcha|Token / Parcha]] and My Queue after a minute.\nIf the day's tokens ran out before the payment completed, the amount is refunded automatically. Otherwise ask the counter or call the helpline 1800-000-0000 with your phone number and the time of payment.",
+  "chips": [
+   "Refund",
+   "Helpline"
+  ]
+ },
+ {
+  "id": "refund",
+  "kw": [
+   "refund",
+   "refund policy",
+   "money back",
+   "cancel and refund",
+   "get refund",
+   "paise wapas",
+   "refund kaise",
+   "refund kab"
+  ],
+  "ex": [
+   "how do i get a refund",
+   "will i get my money back if i cancel"
+  ],
+  "a": "Refunds are handled by hospital staff: they cancel the token and refund the fee (online payments go back through the payment gateway; counter payments are recorded manually). Contact the counter or helpline 1800-000-0000 with your token number. If the day's tokens ran out before your payment completed, the amount is refunded automatically.",
+  "chips": [
+   "Cancel token",
+   "Helpline"
+  ]
+ },
+ {
+  "id": "cancel_change",
+  "kw": [
+   "cancel token",
+   "cancel appointment",
+   "cancel my token",
+   "change department",
+   "change doctor",
+   "reschedule",
+   "change token",
+   "edit details",
+   "wrong department",
+   "token cancel",
+   "badalna",
+   "change date",
+   "book for another day",
+   "tomorrow"
+  ],
+  "ex": [
+   "how do i cancel my token",
+   "can i change my department after booking",
+   "can i book for tomorrow"
+  ],
+  "a": "Once a token is issued you cannot edit or cancel it yourself. Ask the counter or room staff, who can cancel it (and refund the fee if you paid). To change department, book a new token for the right department. Tokens are for the same day only, so booking for tomorrow is possible once the new day's tokens open.",
+  "chips": [
+   "Refund",
+   "How do I book?"
+  ]
+ },
+ {
+  "id": "missed_turn",
+  "kw": [
+   "missed my turn",
+   "missed turn",
+   "late",
+   "running late",
+   "i am late",
+   "skipped",
+   "my token was skipped",
+   "turn nikal gaya",
+   "late ho gaya",
+   "turn miss"
+  ],
+  "ex": [
+   "what if i miss my turn",
+   "i reached late what to do"
+  ],
+  "a": "Tell the room staff or counter as soon as you arrive, with your token number. They control the queue and status, so they can tell you your options. To avoid this, follow [[#/queue|My Queue]] and the notifications, and be near the room before your estimated time.",
+  "chips": [
+   "Estimated time",
+   "Notifications"
+  ]
+ },
+ {
+  "id": "emergency",
+  "kw": [
+   "emergency",
+   "emergency priority",
+   "urgent",
+   "critical patient",
+   "ambulance",
+   "108",
+   "accident",
+   "serious",
+   "jaldi",
+   "emergency token",
+   "emergency kaise"
+  ],
+  "ex": [
+   "what to do in an emergency",
+   "how does emergency priority work"
+  ],
+  "a": "In an emergency go straight to the Emergency department (open 24 hours) or call 108. Do not wait for an online token. Staff can mark a critical patient as Emergency, which moves them to the front of that department's queue without using the normal quota.",
+  "chips": [
+   "Helpline",
+   "OPD timings"
+  ]
+ },
+ {
+  "id": "timings",
+  "kw": [
+   "opd timing",
+   "opd timings",
+   "timing",
+   "timings",
+   "hours",
+   "opening hours",
+   "open time",
+   "closing time",
+   "counter timing",
+   "kab khulta",
+   "time kya hai",
+   "working hours",
+   "sunday",
+   "holiday"
+  ],
+  "ex": [
+   "what are the opd timings",
+   "when does the counter open"
+  ],
+  "a": "OPD: Monday to Saturday, 8:00 AM to 4:00 PM. The token counter opens at 7:30 AM and online registration from 6:00 AM. Emergency: 24 hours. Each department's own timing is on its card in [[#/live|Live Queue]].",
+  "chips": [
+   "Departments",
+   "Emergency"
+  ]
+ },
+ {
+  "id": "notifications",
+  "kw": [
+   "notification",
+   "notifications",
+   "alerts",
+   "alert",
+   "sms",
+   "whatsapp",
+   "message",
+   "bell",
+   "updates",
+   "notification nahi",
+   "notification kaha"
+  ],
+  "ex": [
+   "where can i see notifications",
+   "will i get an sms"
+  ],
+  "a": "Notifications are in [[#/alerts|Notifications]] (the bell icon) and appear as pop-ups. You get: appointment confirmed, payment received, queue status, when your token is called, and OPD availability or room changes. SMS/WhatsApp delivery is not set up yet; the phone number is collected for that.",
+  "chips": [
+   "After registration",
+   "Privacy"
+  ]
+ },
+ {
+  "id": "privacy",
+  "kw": [
+   "privacy",
+   "personal data",
+   "data safe",
+   "secure",
+   "is my data safe",
+   "my details",
+   "phone number shown",
+   "data kaun dekh",
+   "safe hai"
+  ],
+  "ex": [
+   "is my personal data safe",
+   "who can see my phone number"
+  ],
+  "a": "Name, age, phone and address are stored but never shown on public queue screens or returned by public pages. Queue screens show only token, room and department. Card and bank details go only to the payment gateway.",
+  "chips": [
+   "Payment methods",
+   "Notifications"
+  ]
+ },
+ {
+  "id": "otp",
+  "kw": [
+   "otp",
+   "otp not received",
+   "otp nahi aaya",
+   "verify mobile",
+   "resend otp",
+   "otp expired",
+   "otp wrong",
+   "6 digit",
+   "otp kaise",
+   "mobile verify",
+   "otp problem"
+  ],
+  "ex": [
+   "i did not receive the otp",
+   "how does otp verification work"
+  ],
+  "a": "You verify your mobile number with a 6-digit OTP before booking and for patient login. It is valid for 5 minutes, you can ask for a new one after about 30 seconds, and 5 wrong tries lock it. Real SMS delivery is not configured in this demo, so the OTP appears on screen (and in the server console).",
+  "chips": [
+   "How do I book?",
+   "Patient login"
+  ]
+ },
+ {
+  "id": "login",
+  "kw": [
+   "patient login",
+   "login",
+   "log in",
+   "sign in",
+   "logout",
+   "staff login",
+   "admin login",
+   "staff password",
+   "login kaise",
+   "login nahi ho raha",
+   "forgot password",
+   "password"
+  ],
+  "ex": [
+   "how do i log in",
+   "what is staff login"
+  ],
+  "a": "Patients: use [[#/patient-login|Patient Login]] with your mobile number and OTP. Hospital staff: use [[#/staff-login|Staff Login]] with the username and password set by the administrator (staff screens: counter booking, departments, OPD status, analytics, emergency, scan QR).",
+  "chips": [
+   "OTP help",
+   "Staff features"
+  ]
+ },
+ {
+  "id": "family",
+  "kw": [
+   "book for family",
+   "book for someone else",
+   "another person",
+   "for my mother",
+   "for my father",
+   "for my child",
+   "multiple tokens",
+   "two tokens",
+   "more than one",
+   "same phone",
+   "parivar",
+   "maa ke liye",
+   "bachche ke liye"
+  ],
+  "ex": [
+   "can i book for my mother",
+   "can i book multiple tokens with one phone number"
+  ],
+  "a": "Yes. Book once per patient, using that patient's name, age and details (the phone can be yours for notifications). To stop slot hoarding, a phone number can have at most 3 unfinished payments at a time, so finish one booking before starting a fourth.",
+  "chips": [
+   "How do I book?",
+   "Payment methods"
+  ]
+ },
+ {
+  "id": "fees",
+  "kw": [
+   "fee",
+   "fees",
+   "registration fee",
+   "consultation fee",
+   "charges",
+   "cost",
+   "price",
+   "free department",
+   "kitna paisa",
+   "fees kitni",
+   "free"
+  ],
+  "ex": [
+   "how much is the fee",
+   "which departments are free"
+  ],
+  "a": "Each department sets its own registration fee (some are free). Ask me for a specific department, for example \"Cardiology fee\", or see the table on [[#/register|Get Token]].",
+  "chips": [
+   "Departments",
+   "Payment methods"
+  ]
+ },
+ {
+  "id": "live_queue",
+  "kw": [
+   "live queue",
+   "live status",
+   "now serving",
+   "current token",
+   "who is being served",
+   "opd status page",
+   "queue screen",
+   "live queue kaha",
+   "abhi kaun"
+  ],
+  "ex": [
+   "where can i see the live queue",
+   "who is being served now"
+  ],
+  "a": "[[#/live|Live Queue]] shows every department's now-serving token, who is waiting and room numbers, refreshed every 10 seconds. It shows only token, room and department, never personal details.",
+  "chips": [
+   "Departments",
+   "My token status"
+  ]
+ },
+ {
+  "id": "track_token",
+  "kw": [
+   "track token",
+   "track my token",
+   "check token",
+   "find my token",
+   "lost my token",
+   "forgot token number",
+   "token number bhool",
+   "token track kaise"
+  ],
+  "ex": [
+   "how do i track my token",
+   "i forgot my token number"
+  ],
+  "a": "Type your token number (for example GM-048) in the Track box on the home page, or open [[#/queue|My Queue]]. If you forgot the number, check your parcha, your notifications, or ask the counter with your name and phone.",
+  "chips": [
+   "Queue position",
+   "Notifications"
+  ]
+ },
+ {
+  "id": "opd_status",
+  "kw": [
+   "doctor available",
+   "doctor not available",
+   "opd busy",
+   "opd unavailable",
+   "opd status",
+   "doctor status",
+   "doctor aaye",
+   "doctor kab aayenge",
+   "is doctor present"
+  ],
+  "ex": [
+   "is the doctor available today",
+   "what does busy opd mean"
+  ],
+  "a": "Each department shows an OPD status: Available, Busy or Unavailable. Staff update it from OPD Status and patients are notified when it changes. Ask me about a department, for example \"Cardiology OPD status\".",
+  "chips": [
+   "Departments",
+   "Notifications"
+  ]
+ },
+ {
+  "id": "staff_features",
+  "kw": [
+   "staff features",
+   "admin features",
+   "what can staff do",
+   "admin panel",
+   "counter booking staff",
+   "add department",
+   "edit department",
+   "analytics",
+   "reports",
+   "staff dashboard",
+   "doctor console",
+   "print parcha staff",
+   "what can admin do",
+   "what can the admin do",
+   "admin do",
+   "staff do"
+  ],
+  "ex": [
+   "what can the admin do",
+   "how do staff add a department"
+  ],
+  "a": "Staff (after [[#/staff-login|Staff Login]]) can: issue counter tokens and collect fees, add or edit departments (room, doctor, daily tokens, fee), update OPD status, scan QR to check patients in, mark emergencies, print any parcha, refund payments, and view analytics on patients, collections and waiting times.",
+  "chips": [
+   "Emergency priority",
+   "Refund"
+  ]
+ },
+ {
+  "id": "about_bot",
+  "kw": [
+   "what can you do",
+   "who are you",
+   "your name",
+   "help me",
+   "capabilities",
+   "are you ai",
+   "are you a bot",
+   "what is this",
+   "kya kar sakte ho",
+   "tum kaun ho",
+   "features",
+   "agent",
+   "ai agent"
+  ],
+  "ex": [
+   "what can you do for me",
+   "who are you"
+  ],
+  "a": "I'm the SmartCare assistant. I can book a token with you, check your token and queue, tell you the right department and room for a problem, explain how every screen works (registration, payment, parcha, QR, refund, notifications), and answer hospital timings. Click Ask AI agent for the multi-agent mode (triage, queue and booking agents).",
+  "chips": [
+   "Book appointment",
+   "After registration",
+   "Ask AI agent"
+  ]
+ },
+ {
+  "id": "helpline",
+  "kw": [
+   "helpline",
+   "contact",
+   "phone number",
+   "call",
+   "email",
+   "customer care",
+   "support",
+   "complaint",
+   "helpdesk",
+   "address of hospital",
+   "contact number"
+  ],
+  "ex": [
+   "what is the helpline number",
+   "how do i contact the hospital"
+  ],
+  "a": "Helpline: 1800-000-0000. Emergency / ambulance: 108. Email: help@smartcare.example. Address: Hospital Road, District Headquarters, Uttar Pradesh.",
+  "chips": [
+   "Emergency",
+   "OPD timings"
+  ]
+ },
+ {
+  "id": "medical_disclaimer",
+  "kw": [
+   "diagnose",
+   "what disease",
+   "what medicine",
+   "which medicine",
+   "treatment",
+   "prescription",
+   "is it serious",
+   "medicine batao",
+   "dawai",
+   "kya bimari"
+  ],
+  "ex": [
+   "what medicine should i take for fever",
+   "what disease do i have"
+  ],
+  "a": "I can't diagnose or recommend medicines. I can tell you which department to consult and its room, and help you book a token. For anything severe or sudden, go to Emergency or call 108.",
+  "chips": [
+   "Which department?",
+   "Emergency"
+  ]
+ },
+ {
+  "id": "theme",
+  "kw": [
+   "dark mode",
+   "light mode",
+   "theme",
+   "change theme",
+   "dark theme",
+   "night mode",
+   "background"
+  ],
+  "ex": [
+   "how do i change to dark mode"
+  ],
+  "a": "Use the Theme button in the top bar of your dashboard to switch between light and dark."
+ },
+ {
+  "id": "app_guide",
+  "kw": [
+   "app guide",
+   "how to use",
+   "how to use this app",
+   "how to use website",
+   "guide",
+   "tutorial",
+   "features of app",
+   "pages",
+   "menu",
+   "kaise use kare",
+   "website kaise chalaye",
+   "navigation"
+  ],
+  "ex": [
+   "how do i use this website",
+   "what pages does the app have"
+  ],
+  "a": "Main screens: [[#/register|Get Token]] (book), [[#/parcha|Token / Parcha]] (your slip), [[#/queue|My Queue]] (position and time), [[#/genqr|My QR Code]], [[#/live|Live Queue]] (all departments) and [[#/alerts|Notifications]]. Staff have their own login with counter booking, departments, OPD status, scan QR, emergency and analytics.",
+  "chips": [
+   "How do I book?",
+   "After registration"
+  ]
+ }
+]

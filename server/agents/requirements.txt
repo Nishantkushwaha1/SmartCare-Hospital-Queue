@@ -1,0 +1,4 @@
+uagents>=0.22.10
+uagents-core>=0.4.0
+httpx>=0.27
+python-dotenv>=1.0
