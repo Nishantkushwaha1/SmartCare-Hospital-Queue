@@ -1643,6 +1643,75 @@ textarea {
     }
 }
 
+/* chatbot voice input */
+.botf input {
+    flex: 1;
+    min-width: 0
+}
+
+.botmic,
+.botlang {
+    flex: none;
+    border: 1px solid var(--pri);
+    background: var(--card);
+    color: var(--pri);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    height: 40px
+}
+
+.botmic {
+    width: 40px;
+    border-radius: 50%
+}
+
+.botlang {
+    min-width: 36px;
+    padding: 0 6px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700
+}
+
+.botmic[hidden],
+.botlang[hidden] {
+    display: none
+}
+
+.botmic.busy {
+    opacity: .6;
+    cursor: progress
+}
+
+.botmic:hover,
+.botlang:hover {
+    background: var(--soft)
+}
+
+.botmic.rec {
+    background: #d93025;
+    border-color: #d93025;
+    color: #fff;
+    animation: botpulse 1.1s ease-out infinite
+}
+
+@keyframes botpulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(217, 48, 37, .55)
+    }
+
+    100% {
+        box-shadow: 0 0 0 12px rgba(217, 48, 37, 0)
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .botmic.rec {
+        animation: none
+    }
+}
+
 /* ===== token booking: 70% online / 30% offline ===== */
 .split {
     display: grid;

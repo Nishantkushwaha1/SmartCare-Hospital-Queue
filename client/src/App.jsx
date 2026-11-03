@@ -13,7 +13,7 @@ function LegacyApp() {
       '/legacy/qr.js',
       '/legacy/api.js',
       '/legacy/script.js',
-      '/legacy/chatbot.js?v=3', // ?v= forces browsers to drop the old cached chatbot
+      '/legacy/chatbot.js?v=5', // ?v= forces browsers to drop the old cached chatbot
     ];
 
     const load = (src) => new Promise((resolve, reject) => {

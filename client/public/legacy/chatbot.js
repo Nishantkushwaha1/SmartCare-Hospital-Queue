@@ -242,15 +242,127 @@ async function botSend(text){text=text.trim();if(!text)return;
  let r;try{r=reply(text.replace(/^Book (?=[A-Z])/,"book "))}catch(e){r=["Something went wrong. Please try again."]}
  if(r.web){botAI(text.slice(0,500),r);return}
  setTimeout(()=>{BOT.msgs.push({h:r[0],chips:r[1]});botRender()},350)}
-function botToggle(o){BOT.open=o===undefined?!BOT.open:o;const p=$("#botpanel");p.hidden=!BOT.open;$("#botfab").setAttribute("aria-expanded",BOT.open);
+// ---------- Voice input ----------
+// Tap the mic and speak in ANY language: the clip is recorded in the browser, sent to our server (Whisper on Groq,
+// /api/chat/transcribe) which detects the language and returns the text. The text appears in the box and is sent like a
+// typed message, so the rules, AI answers and "search ..." all work by voice. Recording stops by itself when you go quiet
+// (or tap the mic again). If the server has no GROQ_API_KEY, it falls back to the browser's own speech recognition
+// (Chrome / Edge / Safari; one language at a time, use the EN / हि button).
+// Set VOICE.autosend=false if you would rather review/edit the text and press Send yourself.
+const VOICE={mode:null,on:false,busy:false,cancel:false,autosend:true,rec:null,stream:null,ctx:null,timer:null,err:null,
+ SR:window.SpeechRecognition||window.webkitSpeechRecognition,
+ lang:(()=>{try{return localStorage.getItem("sc_voice_lang")||"en-IN"}catch(e){return "en-IN"}})()};
+function voiceUI(state){ // state: false | "listen" | "busy"
+ const mic=$("#botmic"),inp=$("#botin");if(!mic||!inp)return;
+ mic.classList.toggle("rec",state==="listen");mic.classList.toggle("busy",state==="busy");
+ mic.setAttribute("aria-pressed",state==="listen");
+ mic.setAttribute("aria-label",state==="listen"?"Stop listening":"Speak your question");
+ inp.placeholder=state==="listen"?"Listening… speak now":state==="busy"?"Understanding your voice…":"Type your question…"}
+function voiceNote(h){BOT.msgs.push({h});botRender()}
+function micErr(e){const n=e&&e.name;
+ if(n==="NotAllowedError"||n==="SecurityError"||n==="PermissionDeniedError")return "Microphone access is blocked. Tap the lock icon in the address bar, allow the Microphone for this site, and try again.";
+ if(n==="NotFoundError"||n==="DevicesNotFoundError")return "No microphone was found. Please connect one and try again.";
+ if(n==="NotReadableError")return "The microphone is being used by another app. Close it and try again.";
+ return "Could not start the microphone. Please try again."}
+function voiceCleanup(){
+ clearInterval(VOICE.timer);VOICE.timer=null;
+ if(VOICE.stream){VOICE.stream.getTracks().forEach(t=>t.stop());VOICE.stream=null}
+ if(VOICE.ctx){try{VOICE.ctx.close()}catch(e){}VOICE.ctx=null}}
+function voiceStop(cancel){VOICE.cancel=!!cancel;const r=VOICE.rec;if(!r)return;
+ try{if(VOICE.mode==="server")r.stop();else cancel?r.abort():r.stop()}catch(e){}}
+function voiceDeliver(text){ // put the words in the box, then send them
+ const inp=$("#botin");inp.value=text;
+ if(VOICE.autosend)setTimeout(()=>{if(inp.value.trim()===text){inp.value="";botSend(text)}},450);else inp.focus()}
+
+// ---- engine 1: record here, transcribe on the server (any language) ----
+async function recStart(){
+ let stream;
+ try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}})}
+ catch(e){voiceNote(micErr(e));return}
+ const types=["audio/webm;codecs=opus","audio/webm","audio/mp4","audio/ogg;codecs=opus"];
+ const mt=types.find(t=>MediaRecorder.isTypeSupported(t))||"";
+ let rec;try{rec=new MediaRecorder(stream,mt?{mimeType:mt}:undefined)}catch(e){stream.getTracks().forEach(t=>t.stop());voiceNote("This browser cannot record audio.");return}
+ VOICE.stream=stream;VOICE.rec=rec;VOICE.cancel=false;
+ const chunks=[],t0=Date.now();let heard=false,lastVoice=0,an=null,buf=null;
+ try{const AC=window.AudioContext||window.webkitAudioContext;VOICE.ctx=new AC();VOICE.ctx.resume&&VOICE.ctx.resume().catch(()=>{});
+  an=VOICE.ctx.createAnalyser();an.fftSize=1024;VOICE.ctx.createMediaStreamSource(stream).connect(an);buf=new Uint8Array(an.fftSize)}catch(e){an=null}
+ rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+ rec.onstop=async()=>{
+  voiceCleanup();VOICE.on=false;VOICE.rec=null;
+  if(VOICE.cancel){voiceUI(false);return}
+  const blob=new Blob(chunks,{type:rec.mimeType||mt||"audio/webm"});
+  if(!heard||blob.size<1500){voiceUI(false);voiceNote("I did not hear anything. Tap the mic and try again.");return}
+  await voiceSend(blob)};
+ // stop by itself: 1.5 s of quiet after speech, nothing heard for 7 s, or 25 s in total
+ VOICE.timer=setInterval(()=>{
+  const now=Date.now();
+  if(an&&VOICE.ctx&&VOICE.ctx.state==="running"){
+   an.getByteTimeDomainData(buf);let sum=0;for(let i=0;i<buf.length;i++){const v=(buf[i]-128)/128;sum+=v*v}
+   if(Math.sqrt(sum/buf.length)>0.02){heard=true;lastVoice=now}
+   if(heard&&now-lastVoice>1500)return voiceStop(false);
+   if(!heard&&now-t0>7000)return voiceStop(false)}
+  else{heard=true}   // cannot measure loudness here: the person taps the mic again to stop
+  if(now-t0>25000)voiceStop(false)},100);
+ rec.start();VOICE.on=true;voiceUI("listen")}
+async function voiceSend(blob){
+ VOICE.busy=true;voiceUI("busy");
+ try{
+  const res=await fetch(apiBase()+"/chat/transcribe",{method:"POST",headers:{"Content-Type":blob.type||"audio/webm",Accept:"application/json"},body:blob});
+  let d=null;try{d=await res.json()}catch(e){}
+  if(!res.ok)throw new Error((d&&d.error)||"Could not understand the audio.");
+  const text=String(d.text||"").trim();
+  if(!text)voiceNote("I could not make out any words. Please speak a little louder and try again.");
+  else voiceDeliver(text)}
+ catch(e){voiceNote(esc(e.message||"Voice recognition failed. Please try again."))}
+ finally{VOICE.busy=false;voiceUI(false)}}
+
+// ---- engine 2 (fallback): the browser's own speech recognition, one language at a time ----
+function srStart(){
+ const inp=$("#botin"),base=inp.value.trim();
+ const rec=new VOICE.SR();VOICE.rec=rec;VOICE.cancel=false;VOICE.err=null;
+ rec.lang=VOICE.lang;rec.interimResults=true;rec.continuous=false;rec.maxAlternatives=1;
+ rec.onstart=()=>{VOICE.on=true;voiceUI("listen")};
+ rec.onresult=e=>{let t="";for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;inp.value=(base+" "+t).trim()};
+ rec.onerror=e=>{VOICE.err=e.error;
+  if(e.error==="not-allowed"||e.error==="service-not-allowed")voiceNote("Microphone access is blocked. Tap the lock icon in the address bar, allow the Microphone for this site, and try again.");
+  else if(e.error==="no-speech")voiceNote("I did not hear anything. Tap the mic and try again.");
+  else if(e.error==="audio-capture")voiceNote("No microphone was found. Please connect one and try again.");
+  else if(e.error==="network")voiceNote("This browser's voice recognition could not reach its speech service. Please check your internet, or type your question.")};
+ rec.onend=()=>{VOICE.on=false;VOICE.rec=null;voiceUI(false);
+  const v=inp.value.trim();
+  if(VOICE.autosend&&!VOICE.cancel&&!VOICE.err&&v){inp.value="";botSend(v)}else if(BOT.open)inp.focus()};
+ try{rec.start()}catch(e){VOICE.on=false;voiceUI(false)}}
+
+function voiceStart(){
+ if(VOICE.busy)return;
+ if(VOICE.on){voiceStop(false);return}
+ if(!window.isSecureContext){voiceNote("Voice input needs a secure page. Open the site with https:// (or localhost).");return}
+ if(VOICE.mode==="server")recStart();else if(VOICE.mode==="browser")srStart()}
+function voiceLangUI(){const b=$("#botlang");if(!b)return;const hi=VOICE.lang==="hi-IN";b.textContent=hi?"हि":"EN";
+ b.title=hi?"Voice language: Hindi (tap for English)":"Voice language: English / Hinglish (tap for Hindi)";
+ b.setAttribute("aria-label",b.title)}
+function voiceLang(){if(VOICE.on)voiceStop(true);VOICE.lang=VOICE.lang==="hi-IN"?"en-IN":"hi-IN";
+ try{localStorage.setItem("sc_voice_lang",VOICE.lang)}catch(e){}voiceLangUI()}
+// pick the engine once the page knows what the server can do
+async function voiceInit(){
+ const canRec=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.MediaRecorder);
+ let srv=false;try{srv=canRec&&await groqEnabled()}catch(e){}
+ VOICE.mode=srv?"server":VOICE.SR?"browser":null;
+ const m=$("#botmic"),l=$("#botlang");
+ if(!VOICE.mode){m&&m.remove();l&&l.remove();return}
+ if(m)m.hidden=false;
+ if(l)l.hidden=VOICE.mode!=="browser";   // the language button is only needed without server-side detection
+ voiceLangUI()}
+function botToggle(o){BOT.open=o===undefined?!BOT.open:o;if(!BOT.open&&VOICE.on)voiceStop(true);const p=$("#botpanel");p.hidden=!BOT.open;$("#botfab").setAttribute("aria-expanded",BOT.open);
  if(BOT.open){if(!BOT.msgs.length)BOT.msgs.push({h:"Hello! I'm the <b>SmartCare Assistant</b>. Ask me about appointments, tokens, queue status, departments or room numbers.",chips:CHIPS});botRender();$("#botin").focus()}}
 (function mountBot(){
  const w=document.createElement("div");w.id="bot";
  w.innerHTML=`<button id="botfab" class="botfab" aria-label="Open chatbot" aria-expanded="false" aria-controls="botpanel"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9 11h.01M12 11h.01M15 11h.01"/></svg></button>
  <section id="botpanel" class="botpanel" hidden aria-label="SmartCare Assistant"><header><div><b>SmartCare Assistant</b><small>Appointments, queue help &amp; AI answers</small></div><button id="botx" aria-label="Close chatbot">&times;</button></header>
  <div id="botmsgs" class="botmsgs" aria-live="polite"></div>
- <form id="botf" class="botf" autocomplete="off"><input id="botin" placeholder="Type your question…" aria-label="Message"><button class="btn" aria-label="Send">Send</button></form></section>`;
+ <form id="botf" class="botf" autocomplete="off"><input id="botin" placeholder="Type your question…" aria-label="Message"><button type="button" id="botlang" class="botlang" hidden aria-label="Voice language">EN</button><button type="button" id="botmic" class="botmic" hidden aria-label="Speak your question" aria-pressed="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg></button><button class="btn" aria-label="Send">Send</button></form></section>`;
  document.body.appendChild(w);
  $("#botfab").onclick=()=>botToggle();$("#botx").onclick=()=>botToggle(false);
+ $("#botmic").onclick=voiceStart;$("#botlang").onclick=voiceLang;voiceInit();
  $("#botf").onsubmit=e=>{e.preventDefault();const i=$("#botin");const v=i.value;i.value="";botSend(v)};
  addEventListener("keydown",e=>{if(e.key==="Escape"&&BOT.open)botToggle(false)})})();

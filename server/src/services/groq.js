@@ -112,3 +112,61 @@ export async function askGroq(question, history = []) {
   }
   throw new HttpError(502, 'Groq could not answer. Please try again.');
 }
+
+// ---------- Speech-to-text (Whisper on Groq) ----------
+// The chatbot's mic button records a short clip in the browser and posts it here. We do NOT pass a language, so Whisper
+// detects it (Hindi, English, Hinglish, Tamil, Bengali ...). The prompt only nudges the spelling style: Hindi spoken in
+// Roman letters ("mujhe chest pain hai"), which is what the chatbot's built-in rules understand.
+const STT_MODELS = ['whisper-large-v3-turbo', 'whisper-large-v3'];
+const STT_PROMPT = 'Hospital OPD assistant. Mujhe chest pain hai, kaun sa department hai? Mera token status batao, appointment book karna hai.';
+const AUDIO_EXT = { 'audio/webm': 'webm', 'video/webm': 'webm', 'audio/ogg': 'ogg', 'audio/mp4': 'mp4', 'audio/x-m4a': 'm4a', 'audio/m4a': 'm4a', 'audio/aac': 'm4a', 'audio/mpeg': 'mp3', 'audio/wav': 'wav', 'audio/x-wav': 'wav' };
+let goodStt = null;
+
+// Whisper sometimes "hears" its own prompt or a stock phrase in silence; treat that as no speech.
+function looksLikeSilence(data, text) {
+  const segs = Array.isArray(data?.segments) ? data.segments : [];
+  if (segs.length && segs.every((x) => (x.no_speech_prob ?? 0) > 0.6)) return true;
+  const t = text.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  const p = STT_PROMPT.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  return t.length >= p.length * 0.8 && p.includes(t); // only when (nearly) the whole prompt comes back, a real question can share a few words with it
+}
+
+// Returns { text, language }. text is "" when nothing intelligible was said. Throws HttpError with a patient-safe message.
+export async function transcribeAudio(buffer, mime) {
+  if (!groqReady()) throw new HttpError(503, 'Voice input is not turned on for this server (set GROQ_API_KEY in server/.env).');
+  const type = String(mime || '').split(';')[0].trim().toLowerCase();
+  const ext = AUDIO_EXT[type];
+  if (!ext) throw new HttpError(415, 'This audio format is not supported.');
+  if (!Buffer.isBuffer(buffer) || buffer.length < 1500) throw new HttpError(400, 'The recording was too short. Please try again.');
+
+  for (const model of [...new Set([goodStt, env.GROQ_STT_MODEL, ...STT_MODELS].filter(Boolean))]) {
+    const form = new FormData();
+    form.append('file', new Blob([buffer], { type }), `voice.${ext}`);
+    form.append('model', model);
+    form.append('response_format', 'verbose_json');
+    form.append('temperature', '0');
+    form.append('prompt', STT_PROMPT);
+    let res;
+    try {
+      res = await fetch(env.GROQ_BASE_URL + '/audio/transcriptions', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${env.GROQ_API_KEY}` },
+        body: form,
+        signal: AbortSignal.timeout(40_000),
+      });
+    } catch {
+      throw new HttpError(502, 'Could not reach the speech service. Please try again.');
+    }
+    const data = await res.json().catch(() => null);
+    if (!res.ok) {
+      console.error(`[groq-stt] ${model} -> HTTP ${res.status}: ${String(data?.error?.message || '').slice(0, 200)}`);
+      if (modelGone(res.status, data)) continue;
+      const status = res.status === 429 ? 429 : 502; // never forward 401/403 (the frontend would log staff out)
+      throw new HttpError(status, res.status === 429 ? 'The speech service is busy. Please try again in a minute.' : 'Could not understand the audio. Please try again.');
+    }
+    if (goodStt !== model) { goodStt = model; console.log(`[groq-stt] using model ${model}`); }
+    const text = String(data?.text || '').trim();
+    return { text: !text || looksLikeSilence(data, text) ? '' : text.slice(0, 500), language: data?.language || null };
+  }
+  throw new HttpError(502, 'Could not understand the audio. Please try again.');
+}

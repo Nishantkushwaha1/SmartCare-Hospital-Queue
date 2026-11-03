@@ -48,6 +48,8 @@ export const env = Object.freeze({
   GROQ_API_KEY: (process.env.GROQ_API_KEY || '').trim(),
   GROQ_MODEL: (process.env.GROQ_MODEL || 'openai/gpt-oss-120b').trim(),
   GROQ_BASE_URL: (process.env.GROQ_BASE_URL || 'https://api.groq.com/openai/v1').trim().replace(/\/$/, ''),
+  // Speech-to-text for the chatbot's mic button (Whisper on Groq, auto-detects the spoken language). Same GROQ_API_KEY.
+  GROQ_STT_MODEL: (process.env.GROQ_STT_MODEL || 'whisper-large-v3-turbo').trim(),
 
   // Fetch.ai uAgents Concierge (REST). Empty = chatbot works without the agent.
   AGENT_URL: (process.env.AGENT_URL || '').trim().replace(/\/$/, ''),
