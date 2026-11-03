@@ -51,6 +51,7 @@ export default function LabReportView() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [scanning, setScanning] = useState(false);
+  const [facing, setFacing] = useState('environment'); // 'environment' = back camera (default), 'user' = front camera
   const [status, setStatus] = useState(IDLE_MSG);
   const [recent, setRecent] = useState([]); // reports opened in this session
   const scanner = useRef(null);
@@ -85,12 +86,13 @@ export default function LabReportView() {
     } finally { setLoading(false); }
   }, []);
 
-  const startScan = async () => {
-    if (scanner.current) return stopScan().then(() => setStatus('Scanner stopped.'));
+  // Start the camera that faces `mode` ('environment' = back, 'user' = front).
+  const beginScan = async (mode) => {
     if (!window.Html5Qrcode) { setStatus('Camera QR library not loaded. Please type the report code below.'); return; }
     setError('');
+    setFacing(mode);
     setScanning(true);
-    setStatus('Looking for a QR code…');
+    setStatus(`Looking for a QR code (${mode === 'environment' ? 'back' : 'front'} camera)…`);
     const s = new window.Html5Qrcode(CAM_ID);
     scanner.current = s;
     const onDecode = async (text) => {
@@ -99,19 +101,39 @@ export default function LabReportView() {
       const ok = await openReport(text);
       setStatus(ok ? 'Report loaded. Press the button to scan the next QR.' : IDLE_MSG);
     };
+    const cfg = { fps: 10 };
+    const noop = () => {};
     try {
       try {
-        await s.start({ facingMode: 'environment' }, { fps: 10 }, onDecode, () => {});
-      } catch (first) {
-        const cams = await window.Html5Qrcode.getCameras();
-        if (!cams || !cams.length) throw new Error('No cameras found');
-        await s.start(cams[0].id, { fps: 10 }, onDecode, () => {});
+        await s.start({ facingMode: { exact: mode } }, cfg, onDecode, noop); // that exact camera
+      } catch (e1) {
+        try {
+          await s.start({ facingMode: mode }, cfg, onDecode, noop); // preferred; any camera on laptops
+        } catch (e2) {
+          const cams = await window.Html5Qrcode.getCameras();
+          if (!cams || !cams.length) throw new Error('No cameras found');
+          const re = mode === 'environment' ? /back|rear|environment/i : /front|user|face/i;
+          const hit = cams.find((c) => c.label && re.test(c.label));
+          const cam = hit || (mode === 'environment' ? cams[cams.length - 1] : cams[0]);
+          await s.start(cam.id, cfg, onDecode, noop);
+        }
       }
     } catch (err) {
       scanner.current = null;
       setScanning(false);
       setStatus('Camera error: ' + (err && err.message ? err.message : err) + '. Please type the report code below.');
     }
+  };
+
+  const startScan = async () => {
+    if (scanner.current) return stopScan().then(() => setStatus('Scanner stopped.'));
+    await beginScan(facing);
+  };
+
+  const switchCamera = async () => {
+    const next = facing === 'environment' ? 'user' : 'environment';
+    await stopScan();
+    await beginScan(next);
   };
 
   return (
@@ -132,6 +154,11 @@ export default function LabReportView() {
             <div className="scanbox"><div id={CAM_ID} style={{ width: '100%', display: scanning ? 'block' : 'none' }} /></div>
             <p className="sub" aria-live="polite">{status}</p>
             <button className="btn block" onClick={startScan}>{scanning ? 'Stop scanning' : 'Start scanning'}</button>
+            {scanning && (
+              <button type="button" className="btn ghost block" style={{ marginTop: 8 }} onClick={switchCamera}>
+                {facing === 'environment' ? 'Switch to front camera' : 'Switch to back camera'}
+              </button>
+            )}
             <form onSubmit={(e) => { e.preventDefault(); openReport(manual); }}>
               <label htmlFor="labcode">Or type the report code</label>
               <input id="labcode" value={manual} onChange={(e) => setManual(e.target.value.toUpperCase())} placeholder="e.g. LR-7KQ3M9XA2B" autoComplete="off" />

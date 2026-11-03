@@ -862,98 +862,115 @@ V.scan = () =>
   shell(
     "scan",
     head("Scan QR", "Scan a patient's QR code to check them in") +
-      `<div class="grid2"><div class="card"><b>Scan with camera</b><div class="scanbox"><div id="cam" style="width: 100%; display: none;"></div></div><p class="sub" id="cs">Press the button and point the camera at the QR code.</p><button class="btn block" id="sc">Start scanning</button>
+      `<div class="grid2"><div class="card"><b>Scan with camera</b><div class="scanbox"><div id="cam" style="width: 100%; display: none;"></div></div><p class="sub" id="cs">Press the button and point the camera at the QR code.</p><button class="btn block" id="sc">Start scanning</button><button class="btn ghost block" id="sw" style="display:none;margin-top:8px">Switch to front camera</button>
 <label>Or type the token number</label><input id="ct" placeholder="e.g. GM-048" autocomplete="off"><br><button class="btn ghost block" id="sn">Check in</button></div><div><div class="card noprint" id="sr"><b>Result</b><p class="sub">The scanned token's room number and department will appear here.</p></div><div id="sr-rx" style="margin-top:14px"></div></div></div>`,
   );
 let html5QrCode = null;
+let scanFacing = "environment"; // "environment" = back camera (default), "user" = front camera
 V.scan.after = () => {
   $("#sn").onclick = () => checkIn($("#ct").value);
-  $("#sc").onclick = async () => {
-    const st = $("#cs"),
-      v = $("#cam");
+  const st = $("#cs"),
+    v = $("#cam"),
+    btn = $("#sc"),
+    sw = $("#sw");
 
-    if (html5QrCode) {
-      try {
-        await html5QrCode.stop();
-      } catch (e) {}
-      html5QrCode = null;
-      v.style.display = "none";
-      $("#sc").textContent = "Start scanning";
-      st.textContent = "Scanner stopped.";
-      return;
+  const swLabel = () => {
+    sw.textContent =
+      scanFacing === "environment" ? "Switch to front camera" : "Switch to back camera";
+  };
+  const resetUi = () => {
+    html5QrCode = null;
+    v.style.display = "none";
+    btn.textContent = "Start scanning";
+    sw.style.display = "none";
+  };
+  const stopCam = async () => {
+    const q = html5QrCode;
+    html5QrCode = null;
+    if (q) {
+      try { await q.stop(); } catch (e) {}
+      try { q.clear(); } catch (e) {}
     }
+    resetUi();
+  };
 
-    if (!window.Html5Qrcode) {
-      st.textContent =
-        "Camera QR library not loaded. Please type the token number below.";
-      return;
+  const onDecode = async (decodedText) => {
+    await stopCam();
+    st.textContent = "Checking in token...";
+    let token = decodedText;
+    if (token.includes("token=")) {
+      token = token.split("token=")[1].split("&")[0];
     }
+    const ok = await checkIn(token);
+    st.textContent = ok ? "QR scanned." : "QR scanned, but the token was not found.";
+  };
 
+  // Start the camera that faces `facing`. NOTE: html5-qrcode ignores its first argument whenever
+  // `videoConstraints` is given, so the facing mode has to live INSIDE videoConstraints.
+  const begin = async (facing) => {
+    scanFacing = facing;
     v.style.display = "block";
-    $("#sc").textContent = "Stop scanning";
-    st.textContent = "Looking for a QR code...";
+    btn.textContent = "Stop scanning";
+    sw.style.display = "";
+    swLabel();
+    st.textContent =
+      "Looking for a QR code (" + (facing === "environment" ? "back" : "front") + " camera)...";
 
-    html5QrCode = new window.Html5Qrcode("cam");
+    const q = new window.Html5Qrcode("cam");
+    html5QrCode = q;
+    const noop = () => {}; // parse errors per frame are normal
+    const withFacing = (fm) => ({
+      fps: 10,
+      videoConstraints: {
+        facingMode: fm,
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        advanced: [{ focusMode: "continuous" }],
+      },
+    });
     try {
-      const devices = await window.Html5Qrcode.getCameras();
-      if (!devices || !devices.length) {
-        throw new Error("No cameras found");
-      }
-      // prefer back camera if available, otherwise use the first one
-      let cameraId = devices[0].id;
-      for (const d of devices) {
-        if (d.label && d.label.toLowerCase().includes("back")) {
-          cameraId = d.id;
-          break;
+      try {
+        // 1) strict: really that camera
+        await q.start("unused", withFacing({ exact: facing }), onDecode, noop);
+      } catch (e1) {
+        try {
+          // 2) preferred: that camera if there is one, otherwise whatever the device has (laptops)
+          await q.start("unused", withFacing({ ideal: facing }), onDecode, noop);
+        } catch (e2) {
+          // 3) pick from the camera list (labels are filled in once permission is granted)
+          const devices = await window.Html5Qrcode.getCameras();
+          if (!devices || !devices.length) throw new Error("No cameras found");
+          const re = facing === "environment" ? /back|rear|environment/i : /front|user|face/i;
+          const hit = devices.find((d) => d.label && re.test(d.label));
+          const cam = hit || (facing === "environment" ? devices[devices.length - 1] : devices[0]);
+          await q.start(cam.id, { fps: 10 }, onDecode, noop);
         }
       }
-      
-      await html5QrCode.start(
-        cameraId,
-        { 
-          fps: 10,
-          // Removed fixed qrbox so it scans the entire frame, which is much more reliable
-          // for webcam scanning where the QR code might not be perfectly centered.
-          videoConstraints: {
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-            advanced: [{ focusMode: "continuous" }]
-          }
-        },
-        async (decodedText) => {
-          console.log("[Diagnostic] QR Code detected successfully:", decodedText);
-          try {
-            await html5QrCode.stop();
-          } catch (e) {
-            console.error("[Diagnostic] Error stopping scanner:", e);
-          }
-          html5QrCode = null;
-          v.style.display = "none";
-          $("#sc").textContent = "Start scanning";
-          st.textContent = "Checking in token...";
-
-          let token = decodedText;
-          if (token.includes("token=")) {
-            token = token.split("token=")[1].split("&")[0];
-          }
-          console.log("[Diagnostic] Extracted token:", token);
-          const ok = await checkIn(token);
-          st.textContent = ok
-            ? "QR scanned."
-            : "QR scanned, but the token was not found.";
-        },
-        (errorMessage) => {
-          // parse errors are normal, it just means no QR found in this frame
-          // console.debug("[Diagnostic] Scan frame error:", errorMessage);
-        }
-      );
     } catch (err) {
       st.textContent =
         "Camera error: " + (err.message || err) + ". Please type the token number below.";
-      $("#sc").textContent = "Start scanning";
-      v.style.display = "none";
-      html5QrCode = null;
+      resetUi();
     }
+  };
+
+  btn.onclick = async () => {
+    if (html5QrCode) {
+      await stopCam();
+      st.textContent = "Scanner stopped.";
+      return;
+    }
+    if (!window.Html5Qrcode) {
+      st.textContent = "Camera QR library not loaded. Please type the token number below.";
+      return;
+    }
+    await begin(scanFacing);
+  };
+
+  sw.onclick = async () => {
+    if (!html5QrCode) return;
+    const next = scanFacing === "environment" ? "user" : "environment";
+    await stopCam();
+    await begin(next);
   };
 };
 
