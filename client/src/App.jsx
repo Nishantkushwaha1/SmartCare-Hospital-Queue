@@ -13,7 +13,7 @@ function LegacyApp() {
     const files = [
       '/legacy/qr.js',
       '/legacy/api.js',
-      '/legacy/script.js',
+      '/legacy/script.js?v=2', // ?v= cache bust (scan screen parcha)
       '/legacy/lab.js', // Lab Report + Feedback screens (patient) and Lab Desk (staff)
       '/legacy/chatbot.js?v=5', // ?v= forces browsers to drop the old cached chatbot
     ];

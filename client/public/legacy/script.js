@@ -831,15 +831,31 @@ async function checkIn(raw) {
     toast("Enter a token number");
     return false;
   }
+  let ok = false;
   try {
     const n = await SC.checkIn(v);
     const r = $("#sr");
     if (r)
       r.innerHTML = `<div class="okbox" style="text-align:left">Token ${esc(n.token)} checked in</div><div class="row"><span>Room number</span><b>${esc(n.room)}</b></div><div class="row"><span>Department</span><b>${esc(n.department)}</b></div><div class="row"><span>Status</span>${pill("Consultation")}</div>`;
-    return true;
+    ok = true;
   } catch (e) {
     SC.error(e);
-    return false;
+  }
+  // Scan ke baad us token ka parcha side me dikhao (print option ke saath).
+  // Check-in fail ho (jaise token already completed), tab bhi parcha dikh jaye taaki print ho sake.
+  await showScanParcha(v);
+  return ok;
+}
+// Staff "Scan QR" screen: right side me scanned token ka A4 parcha + Print button.
+async function showScanParcha(tk) {
+  const box = $("#sr-rx");
+  if (!box) return;
+  try {
+    const r = await SC.parchaFor(tk);
+    box.innerHTML = `${rxSheet({ token: r.token, name: r.patient.name, age: r.patient.age, address: r.patient.address || "", reg: r.registeredAtText, dept: r.department, doctor: dep(r.department).doc, ahead: r.estimate ? r.ahead : "–", est: r.estimate ? r.estimate.text : "–", code: r.payment ? r.payment.receipt : r.token })}<button class="btn block noprint" id="sr-pr" style="margin-top:12px">Print parcha</button>`;
+    $("#sr-pr").onclick = () => window.print();
+  } catch (e) {
+    box.innerHTML = "";
   }
 }
 V.scan = () =>
@@ -847,7 +863,7 @@ V.scan = () =>
     "scan",
     head("Scan QR", "Scan a patient's QR code to check them in") +
       `<div class="grid2"><div class="card"><b>Scan with camera</b><div class="scanbox"><div id="cam" style="width: 100%; display: none;"></div></div><p class="sub" id="cs">Press the button and point the camera at the QR code.</p><button class="btn block" id="sc">Start scanning</button>
-<label>Or type the token number</label><input id="ct" placeholder="e.g. GM-048" autocomplete="off"><br><button class="btn ghost block" id="sn">Check in</button></div><div class="card" id="sr"><b>Result</b><p class="sub">The scanned token's room number and department will appear here.</p></div></div>`,
+<label>Or type the token number</label><input id="ct" placeholder="e.g. GM-048" autocomplete="off"><br><button class="btn ghost block" id="sn">Check in</button></div><div><div class="card noprint" id="sr"><b>Result</b><p class="sub">The scanned token's room number and department will appear here.</p></div><div id="sr-rx" style="margin-top:14px"></div></div></div>`,
   );
 let html5QrCode = null;
 V.scan.after = () => {
