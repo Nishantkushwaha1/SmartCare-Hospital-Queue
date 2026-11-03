@@ -151,13 +151,16 @@ const NAV_PATIENT = [
   ["parcha", "Token / Parcha"],
   ["genqr", "Generate QR"],
   ["live", "Live Queue"],
+  ["lab", "Lab Report"],
   ["mobile", "Mobile View"],
   ["alerts", "Notifications"],
+  ["feedback", "Feedback"],
 ];
 const NAV_STAFF = [
   ["emergency", "Emergency"],
   ["staff", "Staff Dashboard"],
   ["doctor", "Doctor Console"],
+  ["doctor-lab", "Lab Report"],
   ["admin", "Admin Overview"],
   ["counter", "Counter Booking"],
   ["sparcha", "Print Parcha"],
@@ -166,7 +169,9 @@ const NAV_STAFF = [
   ["depts", "Departments"],
   ["doctors", "OPD Status"],
   ["analytics", "Analytics"],
+  ["labdesk", "Lab Desk"],
   ["alerts", "Notifications"],
+  ["feedbacks", "Patient Feedback"],
 ];
 function patientLogout() {
   pst.set("sc_patient", null);
@@ -370,6 +375,7 @@ function setupBookingOtpVerifier({ phoneInputId, sendBtnId, sectionId, prefix = 
 // ---------- screens ----------
 const V = {};
 V.doctor = () => "";
+V["doctor-lab"] = () => ""; // React screen (client/src/components/LabReportView.jsx)
 const go = (id) => {
   const e = document.getElementById(id);
   e && e.scrollIntoView({ behavior: "smooth" });
@@ -1481,7 +1487,9 @@ ${tile("#/queue", "My Queue", "See patients ahead and your estimated time.", !!m
 ${tile("#/parcha", "Token / Parcha", "View or print your token and parcha.")}
 ${tile("#/genqr", "My QR Code", "Show your token QR at the room.")}
 ${tile("#/live", "Live Queue", "Current status of every department.")}
+${tile("#/lab", "Lab Report", "Book a blood, sugar or urine test and get your report QR.")}
 ${tile("#/alerts", "Notifications", "Updates about your token and the hospital.")}
+${tile("#/feedback", "Feedback", "Tell us about your visit and help us improve.")}
 </div>`,
   );
 };
@@ -1543,5 +1551,8 @@ addEventListener("hashchange", route);
       '<p style="padding:40px;text-align:center;font-family:sans-serif">Loading SmartCare…</p>';
 }
 SC.init()
-  .then(() => route())
+  .then(() => {
+    S.ready = true;
+    route();
+  })
   .catch(SC.fail);

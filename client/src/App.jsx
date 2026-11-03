@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import DoctorDashboard from './components/DoctorDashboard.jsx';
+import LabReportView from './components/LabReportView.jsx';
 
 function LegacyApp() {
   const mounted = useRef(false);
@@ -13,6 +14,7 @@ function LegacyApp() {
       '/legacy/qr.js',
       '/legacy/api.js',
       '/legacy/script.js',
+      '/legacy/lab.js', // Lab Report + Feedback screens (patient) and Lab Desk (staff)
       '/legacy/chatbot.js?v=5', // ?v= forces browsers to drop the old cached chatbot
     ];
 
@@ -67,7 +69,8 @@ export default function App() {
   const path = window.location.pathname;
   
   // Doctor Console is separate
-  const isDoctorRoute = path === '/doctor' || hash === '#/doctor' || hash === '#/doctor/';
+  const isLabRoute = hash === '#/doctor-lab' || hash === '#/doctor-lab/';
+  const isDoctorRoute = isLabRoute || path === '/doctor' || hash === '#/doctor' || hash === '#/doctor/';
 
   // Ensure normal staff/admin entry routes hit the legacy app's Staff Login
   if (path === '/admin' || path === '/admin-dash' || path === '/staff') {
@@ -87,7 +90,7 @@ export default function App() {
     <>
       {isDoctorRoute && (
         <div style={{ display: 'block' }}>
-          <DoctorDashboard />
+          {isLabRoute ? <LabReportView /> : <DoctorDashboard />}
         </div>
       )}
       <div style={{ display: isDoctorRoute ? 'none' : 'block' }}>

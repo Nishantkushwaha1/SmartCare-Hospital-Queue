@@ -81,6 +81,7 @@ const SC = (() => {
       if (prev && S.me && S.me.t === prev.t && prev.s === "Waiting" && S.me.s === "Waiting" && S.me.ahead < prev.a)
         notify("queue", S.me.ahead ? `Queue status: ${S.me.ahead} patient(s) ahead of ${S.me.t}` : `Queue status: you are next, ${S.me.t}`);
       badge();
+      if (window.labSync) await window.labSync(); // patient: tell me when a lab report becomes ready
       const r = location.hash.replace(/^#\/?/, "");
       if (S.admin && LIVE.has(r)) route(true);
     } catch (e) {/* offline: keep showing the last data */ }
@@ -209,5 +210,5 @@ ${opt("UPI", true)}${opt("Card")}${opt("Net Banking")}
   async function setStatus(id, status) { await req("PATCH", "/departments/" + id + "/status", { status }); await refresh() }
   async function emergency(body) { const r = await req("POST", "/admin/emergency", body); await refresh(); return r }
 
-  return { init, fail, error, refresh, merge, markRead, bookOnline, track, login, patientAuth, sendOtp, verifyOtp, logout, issueCounter, parchaFor, checkIn, saveDept, removeDept, setStatus, emergency };
+  return { init, fail, error, refresh, merge, markRead, bookOnline, track, login, patientAuth, sendOtp, verifyOtp, logout, issueCounter, parchaFor, checkIn, saveDept, removeDept, setStatus, emergency, req };
 })();

@@ -24,6 +24,9 @@ import adminRoutes from './routes/admin.js';
 import tinyfishRoutes from './routes/tinyfish.js';
 import chatRoutes from './routes/chat.js';
 import agentRoutes from './routes/agent.js';
+import labRoutes from './routes/lab.js';
+import feedbackRoutes from './routes/feedback.js';
+import { labAdminRouter, feedbackAdminRouter } from './routes/adminLab.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -77,7 +80,11 @@ export function createApp() {
   app.use('/api/payments', paymentRoutes);
   app.use('/api/chat', chatRoutes);
   app.use('/api/agent', agentRoutes);
+  app.use('/api/lab', labRoutes);
+  app.use('/api/feedback', feedbackRoutes);
   app.use('/api/admin/tinyfish', tinyfishRoutes);
+  app.use('/api/admin/lab', labAdminRouter);
+  app.use('/api/admin/feedback', feedbackAdminRouter);
   app.use('/api/admin', adminRoutes);
   app.use('/api', notFound);
 

@@ -1962,3 +1962,72 @@ label.pmo {
 :root[data-theme="dark"] .side a.emgred.on { color: #ff6b6b }
 
 @media print { .noprint { display: none !important } }
+/* ---------- Lab Report, Lab Desk, Feedback (public/legacy/lab.js) ---------- */
+.grid2eq{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px 18px}
+.grid2eq small,.labsum small,.labbig small{color:var(--mute);font-size:12px}
+.lcat{margin-top:4px}
+.labgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.labtest{display:flex;flex-direction:column;gap:10px;padding:16px}
+.labtest.sel{border:2px solid var(--pri);padding:15px}
+.labtest>b{font-size:15.5px;line-height:1.3}
+.labmeta{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--mute);flex:1}
+.slotgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;margin-top:6px}
+.slot{display:flex;flex-direction:column;align-items:center;gap:1px;padding:8px 4px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;cursor:pointer;font:inherit}
+.slot b{font-size:13.5px}
+.slot small{font-size:11.5px;color:var(--ok)}
+.slot:hover:not(:disabled){border-color:var(--pri)}
+.slot.on{background:var(--pri);border-color:var(--pri);color:#fff}
+.slot.on small{color:#fff}
+.slot.full{opacity:.5;cursor:not-allowed}
+.slot.full small{color:var(--bad)}
+.labsum{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:14px;padding:12px 14px;background:var(--soft);border-radius:12px}
+.labsum b{display:block}
+.labbig{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:14px 0;padding:16px;border:2px solid var(--pri);border-radius:14px}
+.labbig .big{color:var(--pri)}
+.labbig span{color:var(--mute);font-size:13px}
+
+.stars{display:flex;align-items:center;gap:4px;margin:4px 0 14px}
+.star{background:none;border:0;padding:0 2px;font-size:36px;line-height:1;color:var(--line);cursor:pointer}
+.star.on{color:#f5a623}
+.star:hover{transform:scale(1.12)}
+#fbword{margin-left:10px;color:var(--mute);font-weight:600}
+.fstars{color:#f5a623;letter-spacing:1px;white-space:nowrap}
+.fstars i{font-style:normal;color:var(--line)}
+.fbar{display:grid;grid-template-columns:36px 1fr 36px;gap:10px;align-items:center;margin:4px 0;font-size:13px}
+.fbar div{height:10px;border-radius:99px;background:var(--soft);overflow:hidden}
+.fbar div i{display:block;height:100%;background:#f5a623;border-radius:99px}
+.fbar b{text-align:right}
+
+.resgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:4px 16px;margin-top:6px}
+
+/* Lab report sheet (white paper in both themes; only .printable is printed) */
+.labrep{background:#fff;color:#111;border:1px solid #cfd6dd;border-radius:8px;padding:22px;font-family:"Noto Sans",system-ui,Arial,sans-serif;text-align:left}
+.labrep small{display:block;color:#555;font-size:11px;letter-spacing:.04em}
+.labrep b{color:#111}
+.labrep-h{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;border-bottom:3px solid #111;padding-bottom:12px}
+.labrep-brand{font-size:22px;font-weight:800;display:block}
+.labrep-h>div:first-child small{text-transform:uppercase;letter-spacing:.2em;font-weight:700;margin-top:2px}
+.labrep-qr{text-align:center;width:150px;flex:none}
+.labrep-qr svg{width:150px;height:150px;display:block}
+.labrep-qr i{display:block;font:normal 11px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;margin-top:2px;color:#111}
+.labrep-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px 18px;margin:14px 0}
+.labrep-info>div{border-bottom:1px dotted #777;padding-bottom:4px}
+.labrep-info small{color:#555}
+.labrep .labrep-tbl{width:100%;border-collapse:collapse;margin-top:6px}
+.labrep .labrep-tbl th{background:#f1f4f7;color:#111;text-align:left;padding:7px 8px;border-bottom:2px solid #111;font-size:12.5px}
+.labrep .labrep-tbl td{padding:7px 8px;border-bottom:1px solid #d8dee4;color:#111;font-size:13.5px}
+.labrep .labrep-tbl tr.abn td{background:#fff4f4}
+.lflag{font-size:12px;font-weight:700;color:#2f7d32}
+.lflag.High,.lflag.Low,.lflag.Abnormal{color:#c62828}
+.labrep-rem{margin:12px 0 0;font-size:13.5px}
+.labrep-note{margin:12px 0 0;font-size:11.5px;color:#555;font-style:italic}
+@media(max-width:560px){.labrep{padding:14px}.labrep-h{flex-direction:column}.labrep-qr{align-self:center}.labrep .labrep-tbl{display:block;overflow-x:auto}}
+@media print{
+  .labrep{border:0;border-radius:0;padding:0}
+  .labrep,.labrep *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
+/* Doctor panel: lab report scanner */
+.labscan{display:grid;grid-template-columns:minmax(260px,1fr) 1.6fr;gap:18px;align-items:start}
+@media(max-width:900px){.labscan{grid-template-columns:1fr}}
+.labscan .scanbox{min-height:40px}

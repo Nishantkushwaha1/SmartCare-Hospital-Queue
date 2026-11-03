@@ -10,11 +10,14 @@ import { Otp } from './models/Otp.js';
 import { Patient } from './models/Patient.js';
 import { Payment } from './models/Payment.js';
 import { Token, TOKEN_STATUSES } from './models/Token.js';
+import { LabBooking, LAB_STATUSES, LAB_FLAGS } from './models/LabBooking.js';
+import { Feedback, FEEDBACK_CATEGORIES } from './models/Feedback.js';
 import { DEPARTMENTS } from './data/departments.js';
+import { LAB_ROOMS, LAB_TESTS, LAB_CATEGORIES, labTestById } from './data/labTests.js';
 
 mongoose.set('strictQuery', true);
 
-export { Admin, Counter, Department, DEPT_STATUSES, Notification, NOTIFICATION_KINDS, Otp, Patient, Payment, Token, TOKEN_STATUSES, DEPARTMENTS };
+export { Admin, Counter, Department, DEPT_STATUSES, Notification, NOTIFICATION_KINDS, Otp, Patient, Payment, Token, TOKEN_STATUSES, DEPARTMENTS, LabBooking, LAB_STATUSES, LAB_FLAGS, Feedback, FEEDBACK_CATEGORIES, LAB_ROOMS, LAB_TESTS, LAB_CATEGORIES, labTestById };
 
 export async function connectDB(uri) {
   if (!uri) throw new Error('MONGODB_URI is empty. Set it in the environment (Render: Environment tab).');

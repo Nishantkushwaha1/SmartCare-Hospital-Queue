@@ -1,19 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const NAV = [
-  ["emergency", "Emergency"],
-  ["staff", "Staff Dashboard"],
-  ["doctor", "Doctor Console"],
-  ["admin", "Admin Overview"],
-  ["counter", "Counter Booking"],
-  ["sparcha", "Print Parcha"],
-  ["scan", "Scan QR"],
-  ["live", "Live Queue"],
-  ["depts", "Departments"],
-  ["doctors", "OPD Status"],
-  ["analytics", "Analytics"],
-  ["alerts", "Notifications"],
-];
+import DoctorShell from './DoctorShell.jsx';
 
 // Same API base as the legacy screens (api.js): same-origin /api by default, or window.SMARTCARE_API_URL.
 const API = (window.SMARTCARE_API_URL || '/api').replace(/\/$/, '');
@@ -149,30 +136,7 @@ export default function DoctorDashboard() {
     } catch(e) {}
   };
 return (
-    <div className="app">
-      <aside className="side">
-        <a className="logo" href="/#/"><i>+</i>SmartCare</a>
-        
-        {NAV.map(([r, l]) => {
-          let c = r === 'doctor' ? 'on' : '';
-          if (r === 'emergency') c += (c ? ' ' : '') + 'emgred';
-          const props = { key: r, href: `/#/${r}` };
-          if (c) props.className = c;
-          if (r === 'alerts') props.id = 'navbell';
-          return <a {...props}>{l}</a>;
-        })}
-        <div className="sp"></div>
-        <a href="/#/">Home</a>
-      </aside>
-
-      <main className="main">
-        <div className="top">
-          <a className="bellbtn" id="bell" href="/#/alerts" aria-label="Notifications">Notifications</a>
-          <button id="th" aria-label="Toggle theme">Theme</button>
-          <div className="av">D</div>
-          <b>Dr. Sharma</b>
-        </div>
-
+    <DoctorShell active="doctor">
         <h2 className="t">Doctor Dashboard</h2>
         <p className="sub">Manage current patient consultations and your queue in Room {room}</p>
 
@@ -268,7 +232,6 @@ return (
           </table>
         </div>
 
-      </main>
-    </div>
+    </DoctorShell>
   );
 }
